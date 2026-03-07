@@ -7,6 +7,8 @@ import funcionesGame as fg
 
 
 
+
+
 def run_game():
     # Inicializar el juego y crear un objeto para almacenar la configuración
     pygame.init()
@@ -19,6 +21,12 @@ def run_game():
     #crea un grupo para almacenar las balas
     balas = Group()
     
+    # Crear un grupo e aliens
+    aliens = Group()
+    
+    #crea la flota de aliens
+    fg.crear_flota(ai_config, pantalla, nave, aliens)
+    
     
     # Iniciar el bucle principal del juego
     while True:
@@ -30,8 +38,10 @@ def run_game():
         for bala in balas.copy():
             if bala.rect.bottom <= 0:
                 balas.remove(bala)
-                
-        fg.actualizar_pantalla(ai_config, pantalla, nave, balas)
+        fg.update_balas(balas)        
+        fg.actualizar_pantalla(ai_config, pantalla, nave, aliens, balas)
+        
+        
         
         
 run_game()

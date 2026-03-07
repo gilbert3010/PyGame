@@ -1,4 +1,4 @@
-class Configuraciones(object):
+class Configuraciones():
     # Clase para almacenar todas las configuraciones de Alien Invasion
     def __init__(self):
         # Inicializar las configuraciones del juego
@@ -14,4 +14,4 @@ class Configuraciones(object):
         self.bala_width = 3
         self.bala_height = 15
         self.bala_color = 60, 60, 60
-    
+        self.balas_permitidas = 3
