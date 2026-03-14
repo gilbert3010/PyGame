@@ -37,7 +37,7 @@ def run_game():
     # Bucle principal del juego
     while True:
         # Eventos
-        fg.verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, balas)
+        fg.verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas)
         
         if estadisticas.game_active:
         # Actualizaciones

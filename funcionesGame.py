@@ -26,7 +26,7 @@ def verificar_eventos_keyup(evento, nave):
         nave.moving_left = False
 
 
-def verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, balas):
+def verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas):
     # Observar eventos de teclado y de ratón
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -38,13 +38,28 @@ def verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, bala
             verificar_eventos_keyup(event, nave)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(estadisticas, play_button, mouse_x, mouse_y)
+            check_play_button(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas, mouse_x, mouse_y)
             
-def check_play_button(estadisticas, play_button, mouse_x, mouse_y):
+def check_play_button(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas, mouse_x, mouse_y):
+    button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     # Iniciar un nuevo juego al hacer clic en Play
-    if play_button.rect.collidepoint(mouse_x, mouse_y) and not estadisticas.game_active:
-        estadisticas.reset_stats()  # Reinicia las estadísticas
+    if button_clicked and not estadisticas.game_active:
+        #restablece la configuración del juego a un estado inicial
+        ai_config.inicializa_configuraciones_dinamicas()
+        #ocultar el cursor del ratón
+        pygame.mouse.set_visible(False)
+        
+        #restablece las estadisticas del juego
+        estadisticas.reset_stats()  
         estadisticas.game_active = True
+        
+        # Vaciar listas de aliens y balas
+        aliens.empty()
+        balas.empty()
+        
+        # Crear una nueva flota y centrar la nave
+        crear_flota(ai_config, pantalla, nave, aliens)
+        nave.centrar_nave()
 
 
 def actualizar_pantalla(ai_config, pantalla, estadisticas, nave, aliens, balas, play_button):
@@ -85,6 +100,7 @@ def check_bala_alien_collisions(ai_config, pantalla, nave, balas, aliens, estadi
     # Si se destruyen todos los aliens, crear nueva flota
     if len(aliens) == 0:
         balas.empty()
+        ai_config.aumentar_velocidad()
         crear_flota(ai_config, pantalla, nave, aliens)
 
 
@@ -168,6 +184,7 @@ def nave_golpeada(ai_config, estadisticas, pantalla, nave, aliens, balas):
         sleep(0.5)
     else:
         estadisticas.game_active = False
+        pygame.mouse.set_visible(True)
         
 
 def check_aliens_bottom(ai_config, estadisticas, pantalla, nave, aliens, balas):
