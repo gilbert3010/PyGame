@@ -29,6 +29,8 @@ class Configuraciones:
         self.factor_velocidad_alien = 1
         # 1 a la derecha; -1 a la izquierda
         self.fleet_direction = 1
+        #puntaje
+        self.puntos_alien = 50
     
     def aumentar_velocidad(self):
         # Aumenta las configuraciones de velocidad

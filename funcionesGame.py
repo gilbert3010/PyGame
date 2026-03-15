@@ -62,7 +62,7 @@ def check_play_button(ai_config, pantalla, estadisticas, play_button, nave, alie
         nave.centrar_nave()
 
 
-def actualizar_pantalla(ai_config, pantalla, estadisticas, nave, aliens, balas, play_button):
+def actualizar_pantalla(ai_config, pantalla, estadisticas, marcador, nave, aliens, balas, play_button):
     # Redibujar la pantalla durante cada pasada por el bucle
     pantalla.fill(ai_config.bg_color)
 
@@ -74,6 +74,9 @@ def actualizar_pantalla(ai_config, pantalla, estadisticas, nave, aliens, balas, 
     nave.blitme()
     aliens.draw(pantalla)
     
+    # Dibujar el marcador
+    marcador.muestra_puntaje()
+    
     #dibuja el boton de play si el juego esta inactivo
     if not estadisticas.game_active:
         play_button.draw_button()
@@ -82,7 +85,7 @@ def actualizar_pantalla(ai_config, pantalla, estadisticas, nave, aliens, balas, 
     pygame.display.flip()
 
 
-def update_balas(ai_config, pantalla, nave, balas, aliens, estadisticas):
+def update_balas(ai_config, pantalla, estadisticas, marcador, nave, balas, aliens):
     # Actualiza las posiciones de las balas y se deshace de las antiguas
     balas.update()
 
@@ -91,12 +94,18 @@ def update_balas(ai_config, pantalla, nave, balas, aliens, estadisticas):
         if bala.rect.bottom <= 0:
             balas.remove(bala)
 
-    check_bala_alien_collisions(ai_config, pantalla, nave, balas, aliens, estadisticas)
+    check_bala_alien_collisions(ai_config, pantalla, estadisticas, marcador, nave, aliens, balas)
 
 
-def check_bala_alien_collisions(ai_config, pantalla, nave, balas, aliens, estadisticas):
+def check_bala_alien_collisions(ai_config, pantalla, estadisticas, marcador, nave, aliens, balas):
     # Comprobar colisiones balas–aliens
     collisions = pygame.sprite.groupcollide(balas, aliens, True, True)
+    
+    if collisions:
+        for aliens in collisions.values():
+            estadisticas.puntaje += ai_config.puntos_alien * len(aliens)
+            marcador.prep_puntaje()
+    
     # Si se destruyen todos los aliens, crear nueva flota
     if len(aliens) == 0:
         balas.empty()
