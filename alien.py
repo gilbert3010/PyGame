@@ -1,3 +1,4 @@
+import os
 import pygame
 from pygame.sprite import Sprite
 
@@ -10,7 +11,9 @@ class Alien(Sprite):
         self.ai_configuraciones = ai_configuraciones
 
         # Cargar la imagen del alien y establecer su rect
-        self.image = pygame.image.load("img/nave_ovni.png")
+        base_path = os.path.dirname(__file__)
+        image_path = os.path.join(base_path, "img", "nave_ovni.png")
+        self.image = pygame.image.load(image_path)
         self.rect = self.image.get_rect()
 
         # Posición inicial cerca de la parte superior izquierda

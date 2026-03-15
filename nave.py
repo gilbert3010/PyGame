@@ -1,14 +1,17 @@
+import os
 import pygame
 
-
-class Nave:
+class Nave(pygame.sprite.Sprite):
     def __init__(self, ai_configuraciones, pantalla):
+        super().__init__()  # Agrega esta línea
         self.pantalla = pantalla
         self.ai_configuraciones = ai_configuraciones
 
         # Cargar la imagen de la nave y obtener su rectángulo
-        self.imagen = pygame.image.load("img/nave_espacial.png")
-        self.rect = self.imagen.get_rect()
+        base_path = os.path.dirname(__file__)
+        image_path = os.path.join(base_path, "img", "nave_espacial.png")
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
         self.pantalla_rect = pantalla.get_rect()
 
         # Iniciar cada nueva nave en la parte inferior central de la pantalla
@@ -34,7 +37,7 @@ class Nave:
 
     def blitme(self):
         # Dibujar la nave en su ubicación actual
-        self.pantalla.blit(self.imagen, self.rect)
+        self.pantalla.blit(self.image, self.rect)
 
     def centrar_nave(self):
         # Centra la nave en la pantalla

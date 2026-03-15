@@ -19,6 +19,8 @@ class Configuraciones:
         self.fleet_drop_speed = 10
         # que tan rapido se incrementa la velocidad del juego
         self.escala_aceleracion = 1.1
+        #que tan rapido se incrementa el puntaje
+        self.escala_puntaje = 1.5
         
         self.inicializa_configuraciones_dinamicas()
     
@@ -33,7 +35,9 @@ class Configuraciones:
         self.puntos_alien = 50
     
     def aumentar_velocidad(self):
-        # Aumenta las configuraciones de velocidad
+        # Aumenta las configuraciones de velocidad y los puntos por alien
         self.factor_velocidad_nave *= self.escala_aceleracion
         self.bala_factor_velocidad *= self.escala_aceleracion
         self.factor_velocidad_alien *= self.escala_aceleracion
+        self.puntos_alien = int(self.puntos_alien * self.escala_puntaje)
+        

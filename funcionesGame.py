@@ -26,7 +26,7 @@ def verificar_eventos_keyup(evento, nave):
         nave.moving_left = False
 
 
-def verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas):
+def verificar_eventos(ai_config, pantalla, estadisticas, marcador, play_button, nave, aliens, balas):
     # Observar eventos de teclado y de ratón
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -38,9 +38,9 @@ def verificar_eventos(ai_config, pantalla, estadisticas, play_button, nave, alie
             verificar_eventos_keyup(event, nave)
         elif event.type == pygame.MOUSEBUTTONDOWN:
             mouse_x, mouse_y = pygame.mouse.get_pos()
-            check_play_button(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas, mouse_x, mouse_y)
+            check_play_button(ai_config, pantalla, estadisticas, marcador, play_button, nave, aliens, balas, mouse_x, mouse_y)
             
-def check_play_button(ai_config, pantalla, estadisticas, play_button, nave, aliens, balas, mouse_x, mouse_y):
+def check_play_button(ai_config, pantalla, estadisticas, marcador, play_button, nave, aliens, balas, mouse_x, mouse_y):
     button_clicked = play_button.rect.collidepoint(mouse_x, mouse_y)
     # Iniciar un nuevo juego al hacer clic en Play
     if button_clicked and not estadisticas.game_active:
@@ -52,6 +52,12 @@ def check_play_button(ai_config, pantalla, estadisticas, play_button, nave, alie
         #restablece las estadisticas del juego
         estadisticas.reset_stats()  
         estadisticas.game_active = True
+        
+        #restablece las imágenes del marcador
+        marcador.prep_puntaje()
+        marcador.prep_puntaje_alto()
+        marcador.prep_nivel()
+        marcador.prep_nave()
         
         # Vaciar listas de aliens y balas
         aliens.empty()
@@ -102,15 +108,27 @@ def check_bala_alien_collisions(ai_config, pantalla, estadisticas, marcador, nav
     collisions = pygame.sprite.groupcollide(balas, aliens, True, True)
     
     if collisions:
-        for aliens in collisions.values():
-            estadisticas.puntaje += ai_config.puntos_alien * len(aliens)
+        for alien_list in collisions.values():
+            estadisticas.puntaje += ai_config.puntos_alien * len(alien_list)
             marcador.prep_puntaje()
+        verifica_puntaje_alto(estadisticas, marcador)
     
     # Si se destruyen todos los aliens, crear nueva flota
     if len(aliens) == 0:
         balas.empty()
         ai_config.aumentar_velocidad()
+        
+        # Incrementar el nivel
+        estadisticas.nivel += 1
+        marcador.prep_nivel()
+        
         crear_flota(ai_config, pantalla, nave, aliens)
+
+def verifica_puntaje_alto(estadisticas, marcador):
+    # Verifica si se ha establecido un nuevo puntaje alto
+    if estadisticas.puntaje > estadisticas.puntaje_alto:
+        estadisticas.puntaje_alto = estadisticas.puntaje
+        marcador.prep_puntaje_alto()
 
 
 def fuego_bala(ai_config, pantalla, nave, balas):
@@ -175,11 +193,14 @@ def change_fleet_direction(ai_config, aliens):
     ai_config.fleet_direction *= -1
 
 
-def nave_golpeada(ai_config, estadisticas, pantalla, nave, aliens, balas):
+def nave_golpeada(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas):
     # Responde a la nave siendo golpeada por un alien
     if estadisticas.naves_restantes > 0:
         # Disminuir naves restantes
         estadisticas.naves_restantes -= 1
+        
+        #actualiza el marcador de naves restantes
+        marcador.prep_nave()
 
         # Vaciar listas de aliens y balas
         aliens.empty()
@@ -196,26 +217,26 @@ def nave_golpeada(ai_config, estadisticas, pantalla, nave, aliens, balas):
         pygame.mouse.set_visible(True)
         
 
-def check_aliens_bottom(ai_config, estadisticas, pantalla, nave, aliens, balas):
+def check_aliens_bottom(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas):
     # Comprueba si algún alien ha llegado al fondo de la pantalla
     pantalla_rect = pantalla.get_rect()
     for alien in aliens.sprites():
         if alien.rect.bottom >= pantalla_rect.bottom:
             # Tratar esto como si la nave hubiera sido golpeada
-            nave_golpeada(ai_config, estadisticas, pantalla, nave, aliens, balas)
+            nave_golpeada(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas)
             break
 
 
 
 
-def update_aliens(ai_config, estadisticas, pantalla, nave, aliens, balas):
+def update_aliens(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas):
     # Comprueba si la flota está en el borde y actualiza la posición de los aliens
     check_fleet_edges(ai_config, aliens)
     aliens.update()
 
     # Busca colisiones alien–nave
     if pygame.sprite.spritecollideany(nave, aliens):
-        nave_golpeada(ai_config, estadisticas, pantalla, nave, aliens, balas)
+        nave_golpeada(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas)
     
     #busca aliens que han llegado al fondo de la pantalla
-    check_aliens_bottom(ai_config, estadisticas, pantalla, nave, aliens, balas)
+    check_aliens_bottom(ai_config, estadisticas, pantalla, marcador, nave, aliens, balas)
