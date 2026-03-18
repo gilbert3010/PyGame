@@ -1,6 +1,17 @@
 import pygame.font
 from pygame.sprite import Group
 from nave import Nave
+import os
+
+class Corazon(pygame.sprite.Sprite):
+    def __init__(self, pantalla):
+        super().__init__()
+        self.pantalla = pantalla
+        # Cargar la imagen del corazón
+        base_path = os.path.dirname(__file__)
+        image_path = os.path.join(base_path, "img", "corazon.png")
+        self.image = pygame.image.load(image_path)
+        self.rect = self.image.get_rect()
 
 class Marcador():
     #una clase para mostrar información sobre el puntaje
@@ -56,10 +67,10 @@ class Marcador():
         """Muestra cuántas naves quedan."""
         self.naves = Group()
         for nave_num in range(self.estadisticas.naves_restantes):
-            nave = Nave(self.ai_config, self.pantalla)
-            nave.rect.x = 10 + nave_num * nave.rect.width
-            nave.rect.y = 10
-            self.naves.add(nave)
+            corazon = Corazon(self.pantalla)
+            corazon.rect.x = 10 + nave_num * corazon.rect.width
+            corazon.rect.y = 10
+            self.naves.add(corazon)
         
     def muestra_puntaje(self):
         """Dibuja el puntaje en la pantalla."""
